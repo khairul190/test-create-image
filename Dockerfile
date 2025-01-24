@@ -16,7 +16,7 @@ WORKDIR /app
 COPY pyproject.toml pdm.lock ./
 
 # Install dependensi berdasarkan pdm.lock
-RUN pdm install --prod --no-editable
+RUN pdm add --prod --no-editable
 
 # Salin seluruh kode proyek ke dalam container
 COPY . .
