@@ -2,7 +2,7 @@
 FROM python:3.11-slim
 
 # Install PDM
-RUN pip install pdm
+RUN pip install --no-cache-dir pdm
 
 # Set environment variables untuk PDM
 ENV PDM_HOME=/root/.pdm \
@@ -16,7 +16,7 @@ WORKDIR /app
 COPY pyproject.toml pdm.lock ./
 
 # Install dependensi berdasarkan pdm.lock
-RUN pdm add --prod --no-editable
+RUN pdm install --prod --no-editable || tail -n 10 /root/.pdm/pdm.log
 
 # Salin seluruh kode proyek ke dalam container
 COPY . .
