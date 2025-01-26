@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-22.04  
 
     steps:
     - name: Checkout code
@@ -26,18 +26,30 @@ jobs:
           VERSION=$(cat VERSION)
           echo "Current version: $VERSION"
         else
-          VERSION="0.0.0"
+          VERSION="v1.0.0"
           echo "VERSION file not found, using default: $VERSION"
         fi
+        # Remove 'v' prefix if present
+        VERSION=${VERSION#v}
         # Increment patch version
         IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
         PATCH=$((PATCH + 1))
-        NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+        NEW_VERSION="v$MAJOR.$MINOR.$PATCH"
         echo "New version: $NEW_VERSION"
         echo "$NEW_VERSION" > VERSION
         echo "version=$NEW_VERSION" >> $GITHUB_ENV
 
+    - name: Check for changes
+      run: |
+        if git diff --quiet && git diff --cached --quiet; then
+          echo "No changes to commit."
+          echo "skip_commit=true" >> $GITHUB_ENV
+        else
+          echo "Changes detected."
+          echo "skip_commit=false" >> $GITHUB_ENV
+
     - name: Commit and push new version
+      if: env.skip_commit == 'false'
       run: |
         git config user.name "github-actions[bot]"
         git config user.email "github-actions[bot]@users.noreply.github.com"
