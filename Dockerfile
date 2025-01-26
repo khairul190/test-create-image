@@ -1,25 +1,17 @@
 # Gunakan base image Python
 FROM python:3.11-slim
 
-# Install PDM
-RUN pip install --no-cache-dir pdm
-
-# Set environment variables untuk PDM
-ENV PDM_HOME=/root/.pdm \
-    PATH=/root/.pdm/bin:$PATH \
-    PDM_IGNORE_SAVED_PYTHON=1
-
 # Buat direktori kerja di dalam container
 WORKDIR /app
 
-# Salin file konfigurasi PDM ke dalam container
-COPY pyproject.toml pdm.lock ./
+# Copy requirements.txt ke container
+COPY requirements.txt /app/requirements.txt
 
-# Install dependensi berdasarkan pdm.lock
-RUN pdm install --prod --no-editable || tail -n 10 /root/.pdm/pdm.log
 
-# Salin seluruh kode proyek ke dalam container
-COPY . .
+# Install requirements
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
+    
 # Perintah default saat container dijalankan
-CMD ["pdm", "run", "python", "app.py"]
+CMD ["python"]
