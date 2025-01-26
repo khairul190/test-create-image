@@ -5,13 +5,14 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy requirements.txt ke container
-COPY requirements.txt /app/requirements.txt
-
+COPY requirements.txt .
 
 # Install requirements
 RUN pip install --no-cache-dir --upgrade pip \
     && pip install --no-cache-dir -r requirements.txt
 
-    
+# Salin folder src dari host ke /app/src di dalam container
+COPY src/ /app/src/
+
 # Perintah default saat container dijalankan
 CMD ["python"]
